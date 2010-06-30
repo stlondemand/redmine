@@ -20,6 +20,9 @@
     	<td colspan="<%= query.columns.size + 2 %>">
     		<span class="expander" onclick="toggleRowGroup(this); return false;">&nbsp;</span>
       	<%= group.blank? ? 'None' : column_content(@query.group_by_column, issue) %> <span class="count">(<%= @issue_count_by_group[group] %>)</span>
+        <% if @query.group_by_column.value(issue).class.name == 'Version' %>
+        <%= render :partial => 'versions/overview', :locals => { :version => @query.group_by_column.value(issue) } %>
+        <% end -%>
     	</td>
 		</tr>
 		<% previous_group = group %>
