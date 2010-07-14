@@ -311,6 +311,7 @@ class ProjectsController < ApplicationController
       end
     end
     @versions.reject! {|version| !project_ids.include?(version.project_id) && @issues_by_version[version].blank?}
+    render :visual_roadmap if params[:visual_roadmap]
   end
   
   def activity
