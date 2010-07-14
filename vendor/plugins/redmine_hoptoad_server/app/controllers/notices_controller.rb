@@ -14,6 +14,11 @@ class NoticesController < ApplicationController
     notice = YAML.load(request.raw_post)['notice']
     redmine_params = YAML.load(notice['api_key'])
     
+    if !notice['environment'].blank?
+      rails_env_match = notice['environment'].to_yaml.match(/RAILS_ENV: (\w+)/)
+      @rails_env = rails_env_match ? rails_env_match[1] : ''
+    end
+
     if authorized = Setting.mail_handler_api_key == redmine_params[:api_key]
 
       # redmine objects
@@ -31,7 +36,7 @@ class NoticesController < ApplicationController
       filtered_backtrace = backtrace.reject{|line| (TRACE_FILTERS+project_trace_filters).map{|filter| line.scan(filter)}.flatten.compact.uniq.any?}
       
       # build subject by removing method name and '[RAILS_ROOT]', make sure it fits in a varchar
-      subject = error_class.to_s
+      subject = "[#{@rails_env}] " + error_class.to_s
       subject << " in #{filtered_backtrace.first.split(':in').first.gsub('[RAILS_ROOT]','')}"[0,255] unless filtered_backtrace.blank?
       
       # build description including a link to source repository
